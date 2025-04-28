@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mirror Room</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      position: absolute;
+      top: 20px;
+      z-index: 10;
+      font-size: 2rem;
+    }
+
+    a {
+      color: #00F0B5;
+      text-decoration: none;
+      position: absolute;
+      bottom: 20px;
+      z-index: 10;
+    }
+
+    a:hover {
+      color: #FED766;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Mirror Room</h1>
+  <a href="gallery.html">← Back to Gallery</a>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/addons/p5.sound.min.js"></script>
+  <script>
+    let brushTrail = [];
+    let maxTrail = 100;
+    let time = 0;
+    let song;
+    let amplitude;
+    let distortionTimer = 0;
+
+    function preload() {
+      song = loadSound('emotionalPiano.mp3');
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      noCursor();
+      background(30);
+
+      song.loop();
+      amplitude = new p5.Amplitude();
+    }
+
+    function draw() {
+      time += 0.01;
+
+      if (millis() - distortionTimer > 5000) {
+        push();
+        translate(random(-5, 5), random(-5, 5));
+        pop();
+        distortionTimer = millis();
+      }
+
+      fill(30, 10);
+      rect(0, 0, width, height);
+
+      let level = amplitude.getLevel();
+
+      let mouseXOffset = map(level, 0, 1, -50, 50);
+      let mouseYOffset = map(level, 0, 1, -50, 50);
+
+      brushTrail.push({
+        x: mouseX + sin(time * 2) * 30 + mouseXOffset,
+        y: mouseY + cos(time * 2.5) * 30 + mouseYOffset,
+        t: time,
+        lvl: level
+      });
+
+      if (brushTrail.length > maxTrail) {
+        brushTrail.shift();
+      }
+
+      noStroke();
+
+      for (let i = 0; i < brushTrail.length; i++) {
+        let b = brushTrail[i];
+        let alpha = map(i, 0, brushTrail.length, 20, 100);
+        let size = map(sin(b.t * 2), -1, 1, 10, 40) + b.lvl * 100;
+        let offset = sin(b.t * 4) * 10;
+
+        let r = map(mouseX, 0, width, 100, 255);
+        let g = map(mouseY, 0, height, 100, 255);
+        let blue = 200 + sin(b.t * 3) * 55;
+
+        fill(r, g, blue, alpha);
+
+        ellipse(b.x, b.y, size, size);
+        ellipse(width - b.x + offset, b.y, size, size);
+        ellipse(b.x, height - b.y + offset, size, size);
+        ellipse(width - b.x, height - b.y, size, size);
+        ellipse(b.x + offset, b.y + offset, size, size);
+        ellipse(width - b.x - offset, height - b.y - offset, size, size);
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+</html>

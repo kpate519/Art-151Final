@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fdf6e3;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .typewriter-container {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    #typewriter {
+      font-size: 1.8rem;
+      color: #333;
+      white-space: pre-wrap;
+    }
+
+    .cat-container {
+      animation: float 3s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+
+    .cat-container img {
+      width: 150px;
+      height: auto;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0); }
+    }
+
+    #next-button {
+      display: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-family: inherit;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #next-button:hover {
+      background-color: #555;
+    }
+
+    .larry-style {
+      font-family: 'Orbitron', sans-serif;
+      color: #FED766;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="typewriter-container">
+    <h1 id="typewriter"></h1>
+  </div>
+
+  <div class="cat-container">
+    <img src="TicketmasterCat.png" alt="Ticketmaster Cat">
+  </div>
+
+  <button id="next-button" onclick="goToNextPage()">Next</button>
+  <audio id="background-music" src="emotionalPiano.mp3" loop autoplay></audio>
+
+  <script>
+    const introTexts = [
+      "Welcome to the Interactive Gallery.",
+      "Here, creativity meets code.",
+      "Your ticketmaster, Larry, will now guide you forward..."
+    ];
+
+    const larrySequence = [
+      "Greetings, traveler... I am Larry.",
+      "You've entered my gallery — a place where reality bends and secrets unfold.",
+      "What lies before you is merely a whisper of the truth..."
+    ];
+
+    let introLine = 0;
+    let larryLine = 0;
+    let i = 0;
+    const speed = 50;
+    const delayBetweenLines = 1000;
+
+    function typeIntro() {
+      const typewriterEl = document.getElementById("typewriter");
+
+      if (introLine < introTexts.length) {
+        if (i < introTexts[introLine].length) {
+          typewriterEl.innerHTML += introTexts[introLine].charAt(i);
+          i++;
+          setTimeout(typeIntro, speed);
+        } else {
+          i = 0;
+          introLine++;
+          typewriterEl.innerHTML += "<br>";
+          setTimeout(typeIntro, delayBetweenLines);
+        }
+      } else {
+        i = 0;
+        setTimeout(typeLarry, delayBetweenLines);
+      }
+    }
+
+    function typeLarry() {
+      const typewriterEl = document.getElementById("typewriter");
+
+      if (larryLine < larrySequence.length) {
+        if (larrySequence) {
+          let span = document.createElement("span");
+          span.className = "larry-style";
+          typewriterEl.appendChild(span);
+
+          function typeStyledText() {
+            if (i < larrySequence[larryLine].length) {
+              span.innerHTML += larrySequence[larryLine].charAt(i);
+              i++;
+              setTimeout(typeStyledText, speed);
+            } else {
+              i = 0;
+              larryLine++;
+              typewriterEl.innerHTML += "<br>";
+              setTimeout(typeLarry, delayBetweenLines);
+            }
+          }
+
+          typeStyledText();
+
+        } else {
+          if (i < larrySequence[larryLine].length) {
+            typewriterEl.innerHTML += larrySequence[larryLine].charAt(i);
+            i++;
+            setTimeout(typeLarry, speed);
+          } else {
+            i = 0;
+            larryLine++;
+            typewriterEl.innerHTML += "<br>";
+            setTimeout(typeLarry, delayBetweenLines);
+          }
+        }
+      } else {
+        document.getElementById("next-button").style.display = "inline-block";
+      }
+    }
+
+    function goToNextPage() {
+      window.location.href = "gallery.html";
+    }
+
+    window.onload = typeIntro;
+  </script>
+
+
+
+</body>
+</html>

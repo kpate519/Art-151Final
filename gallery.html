@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gallery</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #fefefe;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 40px;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .exhibit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #333;
+      transition: transform 0.3s;
+    }
+
+    .exhibit:hover {
+      transform: scale(1.05);
+    }
+
+    .exhibit img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 40px;
+      text-decoration: none;
+      color: #888;
+    }
+
+    .back-link:hover {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎨 Choose an Exhibit</h1>
+
+  <div class="gallery">
+    <a href="art1.html" class="exhibit codegarden">
+      <div class="canvas-container"></div>
+      <span>Flower Garden</span>
+    </a>
+    <a href="art2.html" class="exhibit flight-exhibit">
+      <div class="canvas-container"></div>
+      <span>Letters in Flight</span>
+    </a>
+    <a href="art3.html" class="exhibit flicker-exhibit">
+      <div class="canvas-container"></div>
+      <span>Instructions Not Included</span>
+    </a>
+    
+    <!-- <a href="art4.html" class="exhibit puzzle-exhibit">
+      <div class="canvas-container"></div>
+      <span>Unsolvable Puzzle</span>
+    </a> -->
+    <a href="art5.html" class="exhibit puzzle-exhibit">
+      <div class="mirror-exhibit">
+        <div class="canvas-container" id="mirrorCanvas"></div>
+        <span>Mirror Room</span>
+      </div>
+      
+    </a>
+    
+  </div>
+
+<a href="index.html" class="back-link">← Back to Home</a>
+<audio id="background-music" src="emotionalPiano.mp3" loop autoplay></audio>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+<script src="lettersFlight.js"></script>
+<script src="movingCircle.js"></script> 
+<script src="bloomingFlower.js"></script>
+<!-- <script src="unsolvablePuzzle.js"></script> -->
+<script src="instructionsNotIncluded.js"></script>
+<script src="mirrorRoom.js"></script>
+
+
+
+</body>
+</html>

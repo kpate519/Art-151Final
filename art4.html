@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unsolvable Puzzle</title>
+  <!-- Link to p5.js Library -->
+  <audio id="background-music" src="emotionalPiano.mp3" loop autoplay></audio>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h1 {
+      color: #283044;
+    }
+    p {
+      font-size: 1.2em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Unsolvable Puzzle</h1>
+  <p>This is where your p5.js sketch or content will go.</p>
+  
+  <!-- Back Link to Gallery -->
+  <a href="gallery.html">← Back to Gallery</a>
+
+  <!-- p5.js Sketch -->
+  <script>
+    let puzzlePieces = []; // Array to store the puzzle pieces
+    let piecePositions = []; // Array to store the positions of the pieces
+    let pieceImages = []; // Array to hold the actual images of the puzzle pieces
+
+    function preload() {
+      // Load your pre-made puzzle piece images
+      // Example: puzzlePieces[0], puzzlePieces[1], etc.
+      puzzlePieces.push(loadImage('path_to_piece_1.png'));  // Update path to your images
+      puzzlePieces.push(loadImage('path_to_piece_2.png'));  // Update path to your images
+      puzzlePieces.push(loadImage('path_to_piece_3.png'));  // Update path to your images
+      // Add more pieces as necessary...
+    }
+
+    function setup() {
+      createCanvas(600, 600);
+      noFill();
+      
+      // Set positions for the puzzle pieces (can be manually placed or randomized)
+      piecePositions = [
+        { x: 50, y: 50 },
+        { x: 200, y: 50 },
+        { x: 350, y: 50 },
+        { x: 50, y: 200 },
+        { x: 200, y: 200 },
+        { x: 350, y: 200 },
+        { x: 50, y: 350 },
+        { x: 200, y: 350 },
+        { x: 350, y: 350 },
+      ];
+    }
+
+    function draw() {
+      background(255);
+      
+      // Draw the puzzle pieces at their respective positions
+      for (let i = 0; i < puzzlePieces.length; i++) {
+        let pos = piecePositions[i];
+        image(puzzlePieces[i], pos.x, pos.y);
+      }
+    }
+
+    // Optional: Shuffle puzzle pieces for an unsolvable puzzle
+    function shufflePieces() {
+      for (let i = piecePositions.length - 1; i > 0; i--) {
+        let j = int(random(i + 1));
+        let temp = piecePositions[i];
+        piecePositions[i] = piecePositions[j];
+        piecePositions[j] = temp;
+      }
+    }
+
+    // Optional: Add drag and drop functionality
+    let selectedPiece = null;
+
+    function mousePressed() {
+      // Check if mouse is over a piece and select it
+      for (let i = 0; i < puzzlePieces.length; i++) {
+        let pos = piecePositions[i];
+        if (mouseX > pos.x && mouseX < pos.x + puzzlePieces[i].width && mouseY > pos.y && mouseY < pos.y + puzzlePieces[i].height) {
+          selectedPiece = i; // Select the piece
+          break;
+        }
+      }
+    }
+
+    function mouseDragged() {
+      // If a piece is selected, move it with the mouse
+      if (selectedPiece !== null) {
+        piecePositions[selectedPiece].x = mouseX - puzzlePieces[selectedPiece].width / 2;
+        piecePositions[selectedPiece].y = mouseY - puzzlePieces[selectedPiece].height / 2;
+      }
+    }
+
+    function mouseReleased() {
+      // When the mouse is released, the piece is placed back (if needed)
+      selectedPiece = null;
+    }
+  </script>
+</body>
+</html>

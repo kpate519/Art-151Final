@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌱 Flower Garden</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    .canvas-container {
+      width: 800px;
+      height: 900px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    a {
+      margin-top: 20px;
+      color: #00F0B5;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌱 Flower Garden</h1>
+  <p>Click for flowers :0.</p>
+
+  <div class="canvas-container"></div>
+
+  <a href="gallery.html">← Back to Gallery</a>
+  <audio id="background-music" src="emotionalPiano.mp3" loop autoplay></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="codeGarden.js"></script>
+</body>
+</html>
