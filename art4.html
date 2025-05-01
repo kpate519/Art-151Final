@@ -1,111 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Unsolvable Puzzle</title>
-  <!-- Link to p5.js Library -->
-  <audio id="background-music" src="emotionalPiano.mp3" loop autoplay></audio>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #f3e8f9;
+      margin: 0;
+      padding: 40px;
       text-align: center;
+      position: relative;
     }
+
     h1 {
-      color: #283044;
+      font-size: 2rem;
+      margin-bottom: 20px;
     }
-    p {
-      font-size: 1.2em;
-      color: #555;
+
+    .frame {
+      display: inline-block;
+      padding: 15px;
+      background: #fff;
+      border: 10px solid #555;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+
+    #puzzle-container {
+      width: 600px;
+      height: 600px;
+      background-color: #f3e8f9;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 40px;
+      text-decoration: none;
+      color: #888;
+    }
+
+    .back-link:hover {
+      color: #000;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #eee;
+      border: 2px solid #555;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ddd;
+    }
+
+    .floating-message {
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #5e4b6e;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      pointer-events: none;
+      max-width: 300px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .floating-message.visible {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
   <h1>Unsolvable Puzzle</h1>
-  <p>This is where your p5.js sketch or content will go.</p>
-  
-  <!-- Back Link to Gallery -->
-  <a href="gallery.html">← Back to Gallery</a>
 
-  <!-- p5.js Sketch -->
+  <div class="frame">
+    <div id="puzzle-container"></div>
+    <button id="solve-button">Solve (aka Destroy)</button>
+  </div>
+
+  <a href="gallery.html" class="back-link">← Back to Gallery</a>
+  <audio id="background-music" src="emotionalPiano.mp3" autoplay loop></audio>
+
+  <div id="floating-message" class="floating-message">Some puzzles aren't meant to be solved.</div>
+
   <script>
-    let puzzlePieces = []; // Array to store the puzzle pieces
-    let piecePositions = []; // Array to store the positions of the pieces
-    let pieceImages = []; // Array to hold the actual images of the puzzle pieces
+    let pieces = [];
+    let rows = 4;
+    let cols = 4;
+    let pieceW, pieceH;
+    let draggingPiece = null;
+    let offsetX, offsetY;
+    let flowerImages = [];
+
+    const messages = [
+      "Some puzzles aren't meant to be solved.",
+      "The closer you get, the further it slips away."
+    ];
+    let currentMessageIndex = 0;
+    let messageEl;
 
     function preload() {
-      // Load your pre-made puzzle piece images
-      // Example: puzzlePieces[0], puzzlePieces[1], etc.
-      puzzlePieces.push(loadImage('path_to_piece_1.png'));  // Update path to your images
-      puzzlePieces.push(loadImage('path_to_piece_2.png'));  // Update path to your images
-      puzzlePieces.push(loadImage('path_to_piece_3.png'));  // Update path to your images
-      // Add more pieces as necessary...
+      for (let i = 1; i <= 14; i++) {
+        flowerImages.push(loadImage(`flower1/f${i}.png`));
+      }
     }
 
     function setup() {
-      createCanvas(600, 600);
-      noFill();
-      
-      // Set positions for the puzzle pieces (can be manually placed or randomized)
-      piecePositions = [
-        { x: 50, y: 50 },
-        { x: 200, y: 50 },
-        { x: 350, y: 50 },
-        { x: 50, y: 200 },
-        { x: 200, y: 200 },
-        { x: 350, y: 200 },
-        { x: 50, y: 350 },
-        { x: 200, y: 350 },
-        { x: 350, y: 350 },
-      ];
+      const container = document.getElementById('puzzle-container');
+      let cnv = createCanvas(600, 600);
+      cnv.parent(container);
+
+      pieceW = width / cols;
+      pieceH = height / rows;
+
+      let shuffled = [...flowerImages];
+      shuffle(shuffled, true);
+
+      let i = 0;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          if (i < shuffled.length) {
+            let px = random(width - pieceW);
+            let py = random(height - pieceH);
+            pieces.push(new PuzzlePiece(px, py, x * pieceW, y * pieceH, shuffled[i]));
+            i++;
+          }
+        }
+      }
+
+      messageEl = document.getElementById("floating-message");
+      cycleMessage();
+
+      document.getElementById("solve-button").addEventListener("click", scatterPieces);
     }
 
     function draw() {
-      background(255);
-      
-      // Draw the puzzle pieces at their respective positions
-      for (let i = 0; i < puzzlePieces.length; i++) {
-        let pos = piecePositions[i];
-        image(puzzlePieces[i], pos.x, pos.y);
+      background(243, 232, 249);
+      for (let p of pieces) {
+        p.update();
+        p.show();
       }
     }
 
-    // Optional: Shuffle puzzle pieces for an unsolvable puzzle
-    function shufflePieces() {
-      for (let i = piecePositions.length - 1; i > 0; i--) {
-        let j = int(random(i + 1));
-        let temp = piecePositions[i];
-        piecePositions[i] = piecePositions[j];
-        piecePositions[j] = temp;
-      }
-    }
+    function cycleMessage() {
+      setInterval(() => {
+        messageEl.classList.remove("visible");
 
-    // Optional: Add drag and drop functionality
-    let selectedPiece = null;
+        setTimeout(() => {
+          currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+          messageEl.textContent = messages[currentMessageIndex];
+
+          const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+          const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+          const x = Math.random() * (vw - 300);
+          const y = Math.random() * (vh - 100);
+
+          messageEl.style.left = `${x}px`;
+          messageEl.style.top = `${y}px`;
+
+          messageEl.classList.add("visible");
+        }, 1000);
+      }, 6000);
+      messageEl.classList.add("visible");
+    }
 
     function mousePressed() {
-      // Check if mouse is over a piece and select it
-      for (let i = 0; i < puzzlePieces.length; i++) {
-        let pos = piecePositions[i];
-        if (mouseX > pos.x && mouseX < pos.x + puzzlePieces[i].width && mouseY > pos.y && mouseY < pos.y + puzzlePieces[i].height) {
-          selectedPiece = i; // Select the piece
+      for (let i = pieces.length - 1; i >= 0; i--) {
+        let p = pieces[i];
+        if (p.contains(mouseX, mouseY)) {
+          draggingPiece = p;
+          offsetX = mouseX - p.x;
+          offsetY = mouseY - p.y;
+          pieces.splice(i, 1);
+          pieces.push(p);
           break;
         }
       }
     }
 
     function mouseDragged() {
-      // If a piece is selected, move it with the mouse
-      if (selectedPiece !== null) {
-        piecePositions[selectedPiece].x = mouseX - puzzlePieces[selectedPiece].width / 2;
-        piecePositions[selectedPiece].y = mouseY - puzzlePieces[selectedPiece].height / 2;
+      if (draggingPiece) {
+        draggingPiece.x = mouseX - offsetX;
+        draggingPiece.y = mouseY - offsetY;
       }
     }
 
     function mouseReleased() {
-      // When the mouse is released, the piece is placed back (if needed)
-      selectedPiece = null;
+      if (draggingPiece) {
+        draggingPiece.checkSnap();
+        draggingPiece = null;
+      }
+    }
+
+    class PuzzlePiece {
+      constructor(x, y, tx, ty, img) {
+        this.x = x;
+        this.y = y;
+        this.targetX = tx;
+        this.targetY = ty;
+        this.img = img;
+        this.snapped = false;
+      }
+
+      update() {}
+
+      contains(px, py) {
+        return (
+          px > this.x &&
+          px < this.x + pieceW &&
+          py > this.y &&
+          py < this.y + pieceH
+        );
+      }
+
+      checkSnap() {
+        let d = dist(this.x, this.y, this.targetX, this.targetY);
+        if (d < 20) {
+          this.x = this.targetX;
+          this.y = this.targetY;
+          this.snapped = true;
+        }
+      }
+
+      show() {
+        image(this.img, this.x, this.y, pieceW, pieceH);
+      }
+    }
+
+    function scatterPieces() {
+      for (let p of pieces) {
+        p.x = random(width - pieceW);
+        p.y = random(height - pieceH);
+        p.snapped = false;
+      }
     }
   </script>
 </body>
