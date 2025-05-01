@@ -2,7 +2,7 @@ const mirrorRoom = (p) => {
     let video;
   
     p.setup = function () {
-      const container = document.querySelector('.puzzle-exhibit:last-child .canvas-container');
+      const container = document.querySelector('.mirror-exhibit .canvas-container');
       const canvas = p.createCanvas(400, 400);
       canvas.parent(container);
   
